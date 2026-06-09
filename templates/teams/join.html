@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Join {{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 text-center">
+        <div class="w-12 h-12 bg-brand-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+        </div>
+        {% if team.member_count >= 4 %}
+            <h2 class="text-xl font-bold text-white mb-1">Team Full</h2>
+            <p class="text-red-400 text-sm mb-6">This team already has the maximum of 4 members.</p>
+            <div class="flex items-center justify-center">
+                <a href="{% url 'event_teams' event.slug %}" class="px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg border border-gray-700 transition-colors">
+                    Back to Teams
+                </a>
+            </div>
+        {% else %}
+            <h2 class="text-xl font-bold text-white mb-1">Join {{ team.name }}?</h2>
+            <p class="text-gray-400 text-sm mb-6">You'll be added as a member of this team for {{ event.name }}</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="flex items-center gap-3 justify-center">
+                    <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg transition-all">
+                        Join Team
+                    </button>
+                    <a href="{% url 'event_teams' event.slug %}" class="px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg border border-gray-700 transition-colors">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <a href="{% url 'event_teams' event.slug %}" class="text-sm text-gray-400 hover:text-gray-200 mb-4 inline-flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to Teams
+    </a>
+
+    <!-- Team Header -->
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-1">{{ team.name }}</h1>
+                {% if team.description %}
+                <p class="text-gray-400 text-sm">{{ team.description }}</p>
+                {% endif %}
+                <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ team.member_count }} members
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ team.solve_count }} solves
+                    </span>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-4xl font-bold font-mono text-brand-400 glow-blue">{{ team.score }}</div>
+                <div class="text-xs text-gray-500">total points</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        {% if user.is_authenticated %}
+        <div class="mt-4 pt-4 border-t border-gray-800 flex items-center gap-3">
+            {% if not is_member %}
+                {% if team.member_count >= 4 %}
+                    <button disabled class="px-4 py-2 bg-gray-800 text-gray-500 text-sm font-medium rounded-lg border border-gray-700 cursor-not-allowed">
+                        Team Full (Max 4)
+                    </button>
+                {% else %}
+                    <a href="{% url 'join_team' event.slug team.slug %}" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium rounded-lg transition-colors">
+                        Join Team
+                    </a>
+                {% endif %}
+            {% elif is_member and not is_captain %}
+            <form method="POST" action="{% url 'leave_team' event.slug team.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-sm font-medium rounded-lg border border-red-800/50 transition-colors"
+                        onclick="return confirm('Are you sure you want to leave this team?')">
+                    Leave Team
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Members -->
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Members</h2>
+        <div class="space-y-3">
+            {% for member in members %}
+            <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <div class="w-8 h-8 bg-brand-900 rounded-full flex items-center justify-center">
+                    <span class="text-brand-300 text-xs font-semibold">{{ member.user.username.0|upper }}</span>
+                </div>
+                <span class="text-sm text-gray-200">{{ member.user.username }}</span>
+                {% if member.role == 'captain' %}
+                <span class="px-2 py-0.5 bg-cyber-yellow/10 text-cyber-yellow text-xs font-semibold rounded">Captain</span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-gray-500 text-sm">No members yet</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Solves -->
+    {% if solves %}
+    <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Recent Solves</h2>
+        <div class="space-y-2">
+            {% for solve in solves %}
+            <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                <div class="w-8 h-8 bg-cyber-green/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-cyber-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-sm text-gray-300">{{ solve.user.username }}</span>
+                    <span class="text-gray-500 text-xs mx-1">solved</span>
+                    <a href="{% url 'challenge_detail' event.slug solve.challenge.slug %}" class="text-sm text-brand-400 hover:text-brand-300">{{ solve.challenge.title }}</a>
+                </div>
+                <span class="text-xs font-mono text-cyber-green">+{{ solve.challenge.point_value }}</span>
+                <span class="text-xs text-gray-600 font-mono">{{ solve.created_at|timesince }} ago</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

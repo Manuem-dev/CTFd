@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Teams - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <a href="{% url 'event_detail' event.slug %}" class="text-sm text-gray-400 hover:text-gray-200 mb-2 inline-flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Event
+            </a>
+            <h1 class="text-3xl font-bold text-white">Teams</h1>
+            <p class="text-gray-400 text-sm mt-1">{{ event.name }}</p>
+        </div>
+        {% if user.is_authenticated and not user_team %}
+        <a href="{% url 'create_team' event.slug %}" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium rounded-lg transition-colors">
+            Create Team
+        </a>
+        {% endif %}
+    </div>
+
+    {% if teams %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for team in teams %}
+        <a href="{% url 'team_detail' event.slug team.slug %}"
+           class="card-hover group bg-gray-900 rounded-lg border border-gray-800 p-5 hover:border-brand-600/50 relative overflow-hidden">
+            {% if user_team and user_team.id == team.id %}
+            <div class="absolute top-0 right-0 bg-brand-600/20 text-brand-300 px-2 py-0.5 text-xs font-semibold rounded-bl-lg">YOUR TEAM</div>
+            {% endif %}
+            <div class="flex items-start justify-between mb-3">
+                <h3 class="text-base font-semibold text-white group-hover:text-brand-300 transition-colors">{{ team.name }}</h3>
+                <span class="text-lg font-bold font-mono text-brand-400">{{ team.score }}</span>
+            </div>
+            {% if team.description %}
+            <p class="text-xs text-gray-500 line-clamp-2 mb-3">{{ team.description }}</p>
+            {% endif %}
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+                <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    {{ team.member_count }} members
+                </span>
+                <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {{ team.solve_count }} solves
+                </span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16 text-gray-500">No teams yet. Be the first to create one!</div>
+    {% endif %}
+</div>
+{% endblock %}

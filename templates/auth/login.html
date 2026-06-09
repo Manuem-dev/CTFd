@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - CTF Arena{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-10rem)] flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+        <div class="bg-gray-900 rounded-xl border border-gray-800 p-8">
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 bg-brand-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Welcome back</h2>
+                <p class="text-gray-400 text-sm mt-1">Sign in to your account</p>
+            </div>
+
+            <form method="POST" class="space-y-5">
+                {% csrf_token %}
+                {% for field in form %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">{{ field.label }}</label>
+                    <input type="{{ field.field.widget.input_type|default:'text' }}"
+                           name="{{ field.html_name }}"
+                           value="{{ field.value|default:'' }}"
+                           class="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                           placeholder="{{ field.label }}"
+                           autocomplete="{{ field.html_name }}">
+                    {% if field.errors %}
+                    <p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% if form.non_field_errors %}
+                <div class="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-sm">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                {% endif %}
+                <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-brand-600/25">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-400">
+                    Don't have an account?
+                    <a href="{% url 'register' %}" class="text-brand-400 hover:text-brand-300 font-medium">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Create Event - CTF Arena{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <a href="{% url 'home' %}" class="text-sm text-gray-400 hover:text-gray-200 mb-4 inline-flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to Events
+    </a>
+    <h1 class="text-3xl font-bold text-white mb-8">Create New Event</h1>
+
+    <form method="POST" class="space-y-6" x-data="{ isPublic: true, name: '' }">
+        {% csrf_token %}
+        <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1.5">Event Name</label>
+                <input type="text" name="name" required
+                       x-model="name"
+                       class="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                       placeholder="e.g. CyberStorm CTF 2026">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1.5">URL Slug</label>
+                <input type="text" name="slug" required
+                       class="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all font-mono"
+                       placeholder="cyberstorm-ctf-2026"
+                       x-bind:value="name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : ''">
+                <p class="text-xs text-gray-500 mt-1">Auto-generated from name</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1.5">Description</label>
+                <textarea name="description" rows="3"
+                          class="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
+                          placeholder="Describe your CTF event..."></textarea>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">Start Date</label>
+                    <input type="datetime-local" name="start_date" required
+                           class="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">End Date</label>
+                    <input type="datetime-local" name="end_date" required
+                           class="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all">
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="button" @click="isPublic = !isPublic"
+                        :class="isPublic ? 'bg-brand-600' : 'bg-gray-700'"
+                        class="relative w-11 h-6 rounded-full transition-colors">
+                    <span :class="isPublic ? 'translate-x-5' : 'translate-x-0.5'"
+                          class="inline-block w-5 h-5 bg-white rounded-full transition-transform"></span>
+                </button>
+                <input type="hidden" name="is_public" :value="isPublic ? 'on' : ''">
+                <span class="text-sm text-gray-300">Public event</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-brand-600/25">
+                Create Event
+            </button>
+            <a href="{% url 'home' %}" class="px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg border border-gray-700 transition-colors">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

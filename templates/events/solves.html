@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.name }} - Solves Feed{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <a href="{% url 'event_detail' event.slug %}" class="text-sm text-gray-400 hover:text-gray-200 mb-2 inline-flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Event
+            </a>
+            <h1 class="text-3xl font-bold text-white">Solves Feed</h1>
+            <p class="text-gray-400 text-sm mt-1">{{ event.name }}</p>
+        </div>
+    </div>
+
+    {% if solves %}
+    <div class="space-y-3">
+        {% for solve in solves %}
+        <div class="bg-gray-900 rounded-lg border border-gray-800 p-4 flex items-center gap-4 pop">
+            <div class="w-10 h-10 bg-cyber-green/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-cyber-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm font-semibold text-white">{{ solve.user.username }}</span>
+                    {% if solve.team %}
+                    <span class="text-xs text-gray-500">({{ solve.team.name }})</span>
+                    {% endif %}
+                    <span class="text-gray-500 text-xs">solved</span>
+                    <a href="{% url 'challenge_detail' event.slug solve.challenge.slug %}" class="text-sm text-brand-400 hover:text-brand-300 font-medium">{{ solve.challenge.title }}</a>
+                    <span class="text-xs font-mono text-cyber-green">+{{ solve.challenge.point_value }}</span>
+                </div>
+            </div>
+            <div class="text-xs text-gray-500 font-mono flex-shrink-0">
+                {{ solve.created_at|timesince }} ago
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16 text-gray-500">No solves yet. Be the first!</div>
+    {% endif %}
+</div>
+{% endblock %}
