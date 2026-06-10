@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.db.models import Sum, Count, Q, F
+from django.db.models import Sum, Count, Q, F,Max
 from django.conf import settings
 from django.contrib import messages
 import os
@@ -97,9 +97,10 @@ def event_scoreboard(request, slug):
         Team.objects.filter(event=event)
         .annotate(
             total_score=Sum('solves__challenge__point_value', default=0),
-            total_solves=Count('solves')
+            #total_solves=Count('solves'),
+            submitted_at=Max('solve__created_at')
         )
-        .order_by('-total_score', 'total_solves')
+        .order_by('-total_score','submitted_at')
     )
 
     # Individual scoreboard
@@ -108,9 +109,10 @@ def event_scoreboard(request, slug):
         .values('user__username')
         .annotate(
             total_score=Sum('challenge__point_value'),
-            total_solves=Count('id')
+            #total_solves=Count('id'),
+            submitted_at=Max('created_at')
         )
-        .order_by('-total_score', 'total_solves')
+        .order_by('-total_score','submitted_at')
     )
 
     return render(request, 'events/scoreboard.html', {
